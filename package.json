@@ -10,6 +10,7 @@
   "author": "DaQuirm",
   "license": "LGPL",
   "dependencies": {
-    "jsdom": "~0.5.6"
+    "jsdom": "~0.5.6",
+    "optimist": "~0.3.7"
   }
 }
