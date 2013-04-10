@@ -1,0 +1,22 @@
+{#view AppView context}
+<div>
+	<input type="text">{#ref stringInput}</input>
+	<input type="button" value="Letterize">
+		{#event click function(event) {
+			context.letterize(stringInput.node.value);
+		}}
+	</input>
+	<div>
+		{#collection context.letters function(letter) {
+				return pw.LetterView(letter);
+		}}
+		{#event click function(evt) {
+			if (evt.target.webkitMatchesSelector('.letter')) {
+				context.hide(evt.target.getAttribute('data-index'));
+			}
+		}}
+	</div>
+</div>
+
+
+

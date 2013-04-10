@@ -1,0 +1,7 @@
+{#view LetterView letter}
+<span class="letter" data-index="{#=letter.index}">
+	{#binding letter.visible function(visiblr) {
+		return nxt.Attr('class', visible ? 'letter' : 'letter hidden')
+	}}
+	{#text letter.letter}
+</span>
