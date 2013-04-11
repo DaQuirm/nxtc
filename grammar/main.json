@@ -29,14 +29,25 @@
 			]
 		},
 		{
-			/* {#event click function(event) { context.letterize(stringInput.node.value); }}*/
+			/* {#event click function(event) { context.letterize(stringInput.node.value); }} */
 			"name": "event",
 			"pattern": [
-				{ "view": "token" },
+				{ "event": "token" },
 				"\\s+",
 				{ "$identifier": "name" },
 				"\\s+",
 				{ "$function": "handler" }
+			]
+		},
+		{
+			/* {#collection context.letters function(letter) { return pw.LetterView(letter); }} */
+			"name": "collection",
+			"pattern": [
+				{ "collection": "token" },
+				"\\s+",
+				{ "$identifier": "collection" },
+				"\\s+",
+				{ "$function": "conversion" }
 			]
 		},
 		{
