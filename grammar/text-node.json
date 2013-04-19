@@ -1,0 +1,31 @@
+{
+	"$text_node": [
+		{
+			"or": [
+				{ "token": "$text_template_element", "quantifier": "*" },
+				{ "token": "$text", "quantifier": "*" }
+			],
+			"quantifier": "*"
+		}
+	],
+
+	"$text_template_element": [
+		{ "token": "$template_element_start", "quantifier": 1 },
+		{ "token": "$text_template_element_content", "quantifier": 1 },
+		{ "token": "$template_element_end", "quantifier": 1}
+	],
+
+	"$text_template_element_content": [
+		{
+			"or": [
+				{ "token": "$element_value_of", "quantifier": 1 }
+				{ "token": "$element_text_binding", "quantifier": 1 }
+				{ "token": "$element_event", "quantifier": 1 }
+				{ "token": "$element_collection", "quantifier": 1 }
+				{ "token": "$element_reference", "quantifier": 1 }
+				{ "token": "$text", "quantifier": 1 }
+			],
+			"quantifier": "*"
+		}
+	]
+}

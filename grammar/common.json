@@ -1,0 +1,30 @@
+{
+	"$text": [
+		{ "regex" : ".*" }
+	],
+
+	"$identifier": [
+		{ "regex": "^[A-Za-z_]+\\w*$" }
+	],
+
+	"$dot_path": [
+		{ "regex": "^([^\\W\\d]{1}\\w*)+(\\.[^\\W\\d]{1}\\w*)*$" }
+	],
+
+	"$js_function": [
+		{ "regex": "function.*" }
+	],
+
+	"$nxt_helper": [
+		{ "regex": "nxt\\." },
+		{ "token": "$identifier", "quantifier": "{1}" }
+	],
+
+	"$template_element_start": [
+		{ "regex": "\\{\\{#" }
+	],
+
+	"$template_element_start": [
+		{ "regex": "\\}\\}" }
+	]
+}
