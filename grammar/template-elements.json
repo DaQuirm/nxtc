@@ -23,7 +23,7 @@
 	"$element_text_binding": [
 		{ "token": "$element_text_binding_token", "quantifier": 1 },
 		{ "regex": "\\s+" },
-		{ "token": "$dot", "quantifier": 1 },
+		{ "token": "$dot_path", "quantifier": 1 },
 	],
 
 	"$element_text_token": [

@@ -17,14 +17,14 @@
 
 	"$nxt_helper": [
 		{ "regex": "nxt\\." },
-		{ "token": "$identifier", "quantifier": "{1}" }
+		{ "token": "$identifier", "quantifier": 1 }
 	],
 
 	"$template_element_start": [
-		{ "regex": "\\{\\{#" }
+		{ "regex": "\\{#" }
 	],
 
 	"$template_element_start": [
-		{ "regex": "\\}\\}" }
+		{ "regex": "\\}" }
 	]
 }
