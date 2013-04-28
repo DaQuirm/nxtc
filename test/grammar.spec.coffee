@@ -32,7 +32,7 @@ describe 'Grammar', ->
 				]
 
 			tree = grammar.tokenize '1'
-			tree.should.deep.equal	'$digit': '1'
+			tree.should.deep.equal '$digit': '1'
 
 		it 'matches a sequence of regex terminals inside a token', ->
 			grammar = new Grammar
@@ -42,7 +42,7 @@ describe 'Grammar', ->
 				]
 
 			tree = grammar.tokenize 'Hi'
-			tree.should.deep.equal	'$two_letters': 'Hi'
+			tree.should.deep.equal '$two_letters': 'Hi'
 
 		it 'matches a nonterminal token that contains a terminal', ->
 			grammar = new Grammar
@@ -56,8 +56,9 @@ describe 'Grammar', ->
 
 			tree = grammar.tokenize 'A'
 			tree.should.deep.equal
-				$mark:
+				$mark: [
 					$letter: 'A'
+				]
 
 		it 'matches tokens using specified integer quantifiers', ->
 			grammar = new Grammar
@@ -70,9 +71,10 @@ describe 'Grammar', ->
 
 			tree = grammar.tokenize 'OH'
 			tree.should.deep.equal
-				$state_abbr:
-					$letter: 'O'
-					$letter: 'H'
+				$state_abbr: [
+					{ $letter: 'O' }
+					{ $letter: 'H' }
+				]
 
 		it 'matches mutiple tokens using `zero or more` quantifiers as arrays of matches', ->
 			grammar = new Grammar
@@ -85,9 +87,13 @@ describe 'Grammar', ->
 
 			tree = grammar.tokenize 'branch branch  branch branch   	branch'
 			tree.should.deep.equal
-				$tree:
-					$branch: ['branch', 'branch', 'branch', 'branch', 'branch']
-
+				$tree: [
+					{ $branch: ['branch'] }
+					{ $branch: ['branch'] }
+					{ $branch: ['branch'] }
+					{ $branch: ['branch'] }
+					{ $branch: ['branch'] }
+				]
 
 		it 'can use nested token grammars of arbitrary complexity', ->
 			grammar = new Grammar
@@ -95,13 +101,26 @@ describe 'Grammar', ->
 					{ token: '$om', quantifier: 1 }
 					{ token: '$nom', quantifier: 2 }
 				]
-				$om:
-					regex: 'om'
-				$nom:
-					regex: 'nom'
+				$om: [
+					{ token: '$o', quantifier: 1 }
+					{ token: '$m', quantifier: 1 }
+				]
+				$nom: [
+					{ token: '$n', quantifier: 1 }
+					{ token: '$o', quantifier: 1 }
+					{ token: '$m', quantifier: 1 }
+				]
+				$m:
+					regex: 'm'
+				$n:
+					regex: 'n'
+				$o:
+					regex: 'o'
 
 			tree = grammar.tokenize 'omnomnom'
 			tree.should.deep.equal
-				$yummy:
-					$om: 'om'
-					$nom: ['nom', 'nom']
+				$yummy: [
+					{ $om: [ { $o: 'o' }, { $m: 'm' } ]	}
+					{ $nom: [ { $n: 'n' }, { $o: 'o' }, { $m: 'm' } ] }
+					{ $nom: [ { $n: 'n' }, { $o: 'o' }, { $m: 'm' } ] }
+				]
