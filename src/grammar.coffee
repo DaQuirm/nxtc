@@ -1,5 +1,5 @@
 class Grammar
-	constuctor: (@tokens) ->
+	constructor: (@tokens) ->
 
 	tokenize: ->
 
