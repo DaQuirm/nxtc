@@ -7,6 +7,11 @@ Grammar = require '../src/grammar.coffee'
 
 describe 'Grammar', ->
 
+	describe 'is_terminal', ->
+		it 'returns true if token doesn\'t contain other tokens', ->
+			Grammar.is_terminal([{ regex: 'cellar door' }]).should.be.true
+			Grammar.is_terminal([{ token: '$token' }]).should.be.false
+
 	describe 'constructor', ->
 		it 'accepts an object literal as a parameter which is stored in the `tokens` field', ->
 			grammar = new Grammar
@@ -19,13 +24,13 @@ describe 'Grammar', ->
 				]
 
 	describe 'tokenize', ->
-		it 'returns a syntax tree as an object literal', ->
+		it 'returns a syntax tree as an object literal when passed root token name and a string', ->
 			grammar = new Grammar
 				$digit: [
 					regex: '\\d{1}'
 				]
 
-			tree = grammar.tokenize '1'
+			tree = grammar.tokenize '$digit', '1'
 			tree.should.be.json
 
 		it 'creates a single element AST when matching a string using a grammar comprising only one terminal token', ->
@@ -34,8 +39,8 @@ describe 'Grammar', ->
 					regex: '\\d{1}'
 				]
 
-			tree = grammar.tokenize '1'
-			tree.should.deep.equal '$digit': '1'
+			tree = grammar.tokenize '$digit', '1'
+			tree.should.deep.equal $digit: '1'
 
 		it 'matches a sequence of regex terminals inside a token', ->
 			grammar = new Grammar
@@ -44,8 +49,8 @@ describe 'Grammar', ->
 					{ regex: '\\[a-z]{1}' }
 				]
 
-			tree = grammar.tokenize 'Hi'
-			tree.should.deep.equal '$two_letters': 'Hi'
+			tree = grammar.tokenize '$two_letters', 'Hi'
+			tree.should.deep.equal $two_letters: 'Hi'
 
 		it 'matches a nonterminal token that contains a terminal', ->
 			grammar = new Grammar
@@ -57,7 +62,7 @@ describe 'Grammar', ->
 					regex: '[A-Z]'
 				]
 
-			tree = grammar.tokenize 'A'
+			tree = grammar.tokenize '$mark', 'A'
 			tree.should.deep.equal
 				$mark: [
 					$letter: 'A'
@@ -72,7 +77,7 @@ describe 'Grammar', ->
 					regex: '[A-Z]'
 				]
 
-			tree = grammar.tokenize 'OH'
+			tree = grammar.tokenize '$state_abbr', 'OH'
 			tree.should.deep.equal
 				$state_abbr: [
 					{ $letter: 'O' }
@@ -88,7 +93,7 @@ describe 'Grammar', ->
 					regex: 'branch\s+'
 				]
 
-			tree = grammar.tokenize 'branch branch  branch branch   	branch'
+			tree = grammar.tokenize '$tree', 'branch branch  branch branch   	branch'
 			tree.should.deep.equal
 				$tree: [
 					{ $branch: ['branch'] }
@@ -120,10 +125,23 @@ describe 'Grammar', ->
 				$o:
 					regex: 'o'
 
-			tree = grammar.tokenize 'omnomnom'
+			tree = grammar.tokenize '$yummy', 'omnomnom'
 			tree.should.deep.equal
 				$yummy: [
 					{ $om: [ { $o: 'o' }, { $m: 'm' } ]	}
 					{ $nom: [ { $n: 'n' }, { $o: 'o' }, { $m: 'm' } ] }
 					{ $nom: [ { $n: 'n' }, { $o: 'o' }, { $m: 'm' } ] }
 				]
+
+		it 'returns a null value for the root token if the string couldn\'t be matched', ->
+			grammar = new Grammar
+				$state_abbr: [
+					{ token: '$letter', quantifier: 2 }
+				]
+				$letter: [
+					regex: '[A-Z]'
+				]
+
+			tree = grammar.tokenize '$state_abbr', 'AAA'
+			tree.should.deep.equal { $ }
+
