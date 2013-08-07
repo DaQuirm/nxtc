@@ -8,29 +8,40 @@ describe 'TokenTree', ->
 
 	describe 'constructor', ->
 
-		grammar = null
+		grammar = new Grammar
+			# Terminals
+			'@text'       :  regex:'\w+'
+			'@ang_start'  :  regex:'<'
+			'@ang_end'    :  regex:'>'
+			'@slash'      :  regex:'/'
+			'@space'      :  regex:'\s+'
+			'@quot_mark'  :  regex:'"'
+			'@equals_sign':  regex:'='
+			# Non-terminals
+			'@attr_name'  :  ['@text']
+			'@attr_value' :  ['@quot_mark', '@text', '@quot_mark']
+			'@attribute'  :  ['@attr_name', '@equals_sign', '@attr_value']
+			'@tagname'    :  ['@text']
+			'@tag_open'   :  ['@ang_start', '@tagname', '@space', '@attribute', '@ang_end']
+			'@tag_close'  :  ['@ang_start', '@slash', '@tagname', '@ang_end']
+			'@element'    :  ['@tag_open', '@text', '@tag_close']
+
 		element_string = '<span class="item">text</span>'
 
-		beforeEach ->
-			grammar = new Grammar
-				# Terminals
-				'@text'       :  regex:'\w+'
-				'@ang_start'  :  regex:'<'
-				'@ang_end'    :  regex:'>'
-				'@slash'      :  regex:'/'
-				'@space'      :  regex:'\s+'
-				'@quot_mark'  :  regex:'"'
-				'@equals_sign':  regex:'='
-				# Non-terminals
-				'@attr_name'  :  ['@text']
-				'@attr_value' :  ['@quot_mark', '@text', '@quot_mark']
-				'@attribute'  :  ['@attr_name', '@equals_sign', '@attr_value']
-				'@tagname'    :  ['@text']
-				'@tag_open'   :  ['@ang_start', '@tagname', '@space', '@attribute', '@ang_end']
-				'@tag_close'  :  ['@ang_start', '@slash', '@tagname', '@ang_end']
-				'@element'    :  ['@tag_open', '@text', '@tag_close']
+		simple_grammar = new Grammar
+			# Terminals
+			'@a': regex:'a'
+			'@b': regex:'b'
+			'@c': regex:'c'
+			# Non-terminals
+			'@abc': ['@a', '@b', '@c']
+			'@root': ['@abc']
 
+		abc_string = 'abc'
+
+		beforeEach ->
 			tree = new TokenTree grammar, '@element'
+			simple_tree = new TokenTree simple_grammar, '@root'
 
 		it 'creates a tree based on a grammar instance and a root token', ->
 			tree.grammar.should.deep.equal grammar
@@ -89,3 +100,16 @@ describe 'TokenTree', ->
 			ang_start_token.name.should.equal '@ang_start'
 			ang_start_token.next.name.should.equal '@tagname'
 			ang_start_token.match.should.deep.equal { position: 0, length: 1 }
+
+	describe 'bloom', ->
+		it 'uses terminal matches to calculate match proeprties for all non-terminals', ->
+			do simple_tree.expand
+			do simple_tree.match abc_string, 0
+			do simple_tree.bloom
+			abc_token = simple_tree.root_token.children[0]
+			abc_token.children.should.have.property 'length', 3
+			abc_token.match.should.deep.equal { position: 0, length: 3 }
+			simple_tree.root_token.match.should.deep.equal { position: 0, length: 3 }
+
+
+
