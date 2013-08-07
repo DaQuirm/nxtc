@@ -3,45 +3,46 @@ chai = require 'chai'
 should = do chai.should
 
 Grammar = require '../src/grammar.coffee'
+TokenTree = require '../src/token-tree.coffee'
 
 describe 'TokenTree', ->
 
+	grammar = new Grammar
+		# Terminals
+		'@text'       :  regex:'\w+'
+		'@ang_start'  :  regex:'<'
+		'@ang_end'    :  regex:'>'
+		'@slash'      :  regex:'/'
+		'@space'      :  regex:'\s+'
+		'@quot_mark'  :  regex:'"'
+		'@equals_sign':  regex:'='
+		# Non-terminals
+		'@attr_name'  :  ['@text']
+		'@attr_value' :  ['@quot_mark', '@text', '@quot_mark']
+		'@attribute'  :  ['@attr_name', '@equals_sign', '@attr_value']
+		'@tagname'    :  ['@text']
+		'@tag_open'   :  ['@ang_start', '@tagname', '@space', '@attribute', '@ang_end']
+		'@tag_close'  :  ['@ang_start', '@slash', '@tagname', '@ang_end']
+		'@element'    :  ['@tag_open', '@text', '@tag_close']
+
+	element_string = '<span class="item">text</span>'
+
+	simple_grammar = new Grammar
+		# Terminals
+		'@a': regex:'a'
+		'@b': regex:'b'
+		'@c': regex:'c'
+		# Non-terminals
+		'@abc': ['@a', '@b', '@c']
+		'@root': ['@abc']
+
+	abc_string = 'abc'
+
+	beforeEach ->
+		tree = new TokenTree grammar, '@element'
+		simple_tree = new TokenTree simple_grammar, '@root'
+
 	describe 'constructor', ->
-
-		grammar = new Grammar
-			# Terminals
-			'@text'       :  regex:'\w+'
-			'@ang_start'  :  regex:'<'
-			'@ang_end'    :  regex:'>'
-			'@slash'      :  regex:'/'
-			'@space'      :  regex:'\s+'
-			'@quot_mark'  :  regex:'"'
-			'@equals_sign':  regex:'='
-			# Non-terminals
-			'@attr_name'  :  ['@text']
-			'@attr_value' :  ['@quot_mark', '@text', '@quot_mark']
-			'@attribute'  :  ['@attr_name', '@equals_sign', '@attr_value']
-			'@tagname'    :  ['@text']
-			'@tag_open'   :  ['@ang_start', '@tagname', '@space', '@attribute', '@ang_end']
-			'@tag_close'  :  ['@ang_start', '@slash', '@tagname', '@ang_end']
-			'@element'    :  ['@tag_open', '@text', '@tag_close']
-
-		element_string = '<span class="item">text</span>'
-
-		simple_grammar = new Grammar
-			# Terminals
-			'@a': regex:'a'
-			'@b': regex:'b'
-			'@c': regex:'c'
-			# Non-terminals
-			'@abc': ['@a', '@b', '@c']
-			'@root': ['@abc']
-
-		abc_string = 'abc'
-
-		beforeEach ->
-			tree = new TokenTree grammar, '@element'
-			simple_tree = new TokenTree simple_grammar, '@root'
 
 		it 'creates a tree based on a grammar instance and a root token', ->
 			tree.grammar.should.deep.equal grammar
