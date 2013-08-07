@@ -1,8 +1,9 @@
 class Grammar
-	@is_terminal: (token) ->
-		token.every (item) -> 'regex' of item
 
 	constructor: (@tokens) ->
+
+	is_terminal: (token_name) ->
+		@tokens[token_name].every (item) -> typeof item isnt 'string' and 'regex' of item
 
 	tokenize: (root, string) ->
 		tree =
@@ -26,10 +27,5 @@ class Grammar
 				if not Grammar.is_terminal item
 					nonterminal = item
 					break
-
-
-
-
-
 
 module.exports = Grammar

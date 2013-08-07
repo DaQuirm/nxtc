@@ -8,8 +8,11 @@ describe 'Grammar', ->
 
 	describe 'is_terminal', ->
 		it 'returns true if token doesn\'t contain other tokens', ->
-			Grammar.is_terminal([{ regex: 'cellar door' }]).should.be.true
-			Grammar.is_terminal([{ token: '@token' }]).should.be.false
+			grammar = new Grammar
+				'@terminal': [ regex:'a', regex:'b' ]
+				'@non_terminal': [ '@terminal' ]
+			grammar.is_terminal('@terminal').should.be.true
+			grammar.is_terminal('@non_terminal').should.be.false
 
 	describe 'constructor', ->
 		it 'accepts an object literal as a parameter which is stored in the `tokens` field', ->
