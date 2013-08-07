@@ -56,6 +56,15 @@ describe 'TokenTree', ->
 				match: null
 			tree.current_token.should.deep.equal tree.root_token
 
+	describe 'create_node', ->
+		it 'creates an empty tree node based on a token name', ->
+			node = TokenTree.create_node '@root'
+			node.should.deep.equal
+				name: '@root'
+				children: []
+				next: null
+				match: null
+
 	describe 'expand', ->
 		it 'expands current_token until it\'s a terminal', ->
 			do tree.expand
