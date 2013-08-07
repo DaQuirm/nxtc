@@ -27,7 +27,7 @@ describe 'TokenTree', ->
 				'@attribute'  :  ['@attr_name', '@equals_sign', '@attr_value']
 				'@tagname'    :  ['@text']
 				'@tag_open'   :  ['@ang_start', '@tagname', '@space', '@attribute', '@ang_end']
-				'@tag_close'  :  ['@ang_start', '@slash', '@tagname' '@ang_end']
+				'@tag_close'  :  ['@ang_start', '@slash', '@tagname', '@ang_end']
 				'@element'    :  ['@tag_open', '@text', '@tag_close']
 
 			tree = new TokenTree grammar, '@element'
@@ -62,7 +62,7 @@ describe 'TokenTree', ->
 			should.not.exist tree.root_token.match
 
 		it 'threads token connecting them via the `next` field', ->
-			do.tree.expand
+			do tree.expand
 			tag_open_token = tree.root_token.children[0]
 			tag_open_token.next.name.should.equal 'text'
 			tag_close_token = tag_open_token.next.next
