@@ -83,7 +83,6 @@ describe 'TokenTree', ->
 			tag_close_token = tag_open_token.next.next
 			tag_close_token.next.should.be.null
 
-
 	describe 'match', ->
 		it 'matches contiguous terminal tokens starting from current_token in a string starting from specified position', ->
 			do tree.expand
@@ -105,13 +104,20 @@ describe 'TokenTree', ->
 			ang_start_token.next.name.should.equal '@tagname'
 			ang_start_token.match.should.deep.equal { position: 0, length: 1 }
 
+			do simple_tree.expand
+			do simple_tree.match abc_string, 0
+			abc_token = simple_tree.root_token.children[0]
+			abc_token.children.should.have.property 'length', 3
+			abc_token.children[0].match.should.deep.equal { position: 0, length: 1 }
+			abc_token.children[1].match.should.deep.equal { position: 1, length: 1 }
+			abc_token.children[2].match.should.deep.equal { position: 2, length: 1 }
+
 	describe 'bloom', ->
 		it 'uses terminal matches to calculate match proeprties for all non-terminals', ->
 			do simple_tree.expand
 			do simple_tree.match abc_string, 0
 			do simple_tree.bloom
 			abc_token = simple_tree.root_token.children[0]
-			abc_token.children.should.have.property 'length', 3
 			abc_token.match.should.deep.equal { position: 0, length: 3 }
 			simple_tree.root_token.match.should.deep.equal { position: 0, length: 3 }
 
