@@ -38,6 +38,9 @@ describe 'TokenTree', ->
 
 	abc_string = 'abc'
 
+	tree = null
+	simple_tree = null
+
 	beforeEach ->
 		tree = new TokenTree grammar, '@element'
 		simple_tree = new TokenTree simple_grammar, '@root'
