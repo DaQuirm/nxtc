@@ -78,11 +78,11 @@ describe 'TokenTree', ->
 			#     @ang_end
 			#   @text
 			#   @tag_close
-			(Grammar.is_termial tree.current_token).should.be.true
+			(grammar.is_terminal tree.current_token.name).should.be.true
 			tree.current_token.name.should.equal '@ang_start'
-			tree.root_token.children.to.be.an.instanceof 'Array'
-			tree.root_token.children.to.have.property 'length', 3
-			tree.root_token.children[0].children.to.have.property 'length', 5
+			tree.root_token.children.should.be.an.instanceof Array
+			tree.root_token.children.should.have.property 'length', 3
+			tree.root_token.children[0].children.should.have.property 'length', 5
 			should.not.exist tree.root_token.match
 
 		it 'threads token connecting them via the `next` field', ->
@@ -106,7 +106,7 @@ describe 'TokenTree', ->
 			#     @ang_end
 			#   @text
 			#   @tag_close
-			(Grammar.is_termial tree.current_token).should.be.false
+			(grammar.is_termial tree.current_token.name).should.be.false
 			should.not.exist tree.current_token.match
 			ang_start_token = tree.root_token.children[0].children[0]
 			ang_start_token.name.should.equal '@ang_start'
