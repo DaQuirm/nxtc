@@ -20,4 +20,12 @@ class TokenTree
 			last_child.next = @current_token.next if last_child?
 			@current_token = @current_token.next = first_child
 
+	match: (string, start) ->
+		while @current_token? and @grammar.is_terminal @current_token.name
+			match = string.substr(start).match @grammar.tokens[@current_token.name].regex
+			@current_token.match =
+				position: match.index + start
+				length: match[0].length
+			@current_token = @current_token.next
+
 module.exports = TokenTree
