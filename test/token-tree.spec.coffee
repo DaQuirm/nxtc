@@ -88,9 +88,10 @@ describe 'TokenTree', ->
 		it 'threads token connecting them via the `next` field', ->
 			do tree.expand
 			tag_open_token = tree.root_token.children[0]
-			tag_open_token.next.name.should.equal 'text'
-			tag_close_token = tag_open_token.next.next
-			tag_close_token.next.should.be.null
+			tag_open_token.next.name.should.equal '@ang_start'
+			ang_end_token = tag_open_token.children[3].next
+			tag_close_token = ang_end_token.next.next
+			should.not.exist tag_close_token.next
 
 	describe 'match', ->
 		it 'matches contiguous terminal tokens starting from current_token in a string starting from specified position', ->

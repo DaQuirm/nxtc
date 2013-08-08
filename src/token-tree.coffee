@@ -11,7 +11,13 @@ class TokenTree
 
 	expand: ->
 		while not @grammar.is_terminal @current_token.name
-			@current_token.children = @grammar.tokens[@current_token.name].map TokenTree.create_node
-			@current_token = @current_token.next
+			@grammar.tokens[@current_token.name].forEach (token, index) =>
+				node = TokenTree.create_node token
+				@current_token.children.push node
+				@current_token.children[index-1].next = node unless index is 0
+
+			[first_child, _..., last_child] = @current_token.children
+			last_child.next = @current_token.next if last_child?
+			@current_token = @current_token.next = first_child
 
 module.exports = TokenTree
