@@ -6,8 +6,9 @@ class TokenTree
 		next: null
 		match: null
 
-	constructor: (@grammar, root_token_name)->
+	constructor: (@grammar, @string, root_token_name)->
 		@current_token = @root_token = TokenTree.create_node root_token_name
+		@position = 0
 
 	expand: ->
 		while not @grammar.is_terminal @current_token.name
@@ -22,12 +23,13 @@ class TokenTree
 			last_child.parent = @current_token
 			@current_token = @current_token.next = first_child
 
-	match: (string, start) ->
+	match: ->
 		while @current_token? and @grammar.is_terminal @current_token.name
-			match = string.substr(start).match @grammar.tokens[@current_token.name].regex
+			match = @string.substr(@position).match @grammar.tokens[@current_token.name].regex
 			@current_token.match =
-				position: match.index + start
+				position: match.index + @position
 				length: match[0].length
+			@position += match[0].length
 			parent = @current_token.parent
 			while parent
 				parent.match =

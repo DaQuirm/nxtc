@@ -9,11 +9,11 @@ describe 'TokenTree', ->
 
 	grammar = new Grammar
 		# Terminals
-		'@text'       :  regex:'\w+'
+		'@text'       :  regex:'\\w+'
 		'@ang_start'  :  regex:'<'
 		'@ang_end'    :  regex:'>'
 		'@slash'      :  regex:'/'
-		'@space'      :  regex:'\s+'
+		'@space'      :  regex:'\\s+'
 		'@quot_mark'  :  regex:'"'
 		'@equals_sign':  regex:'='
 		# Non-terminals
@@ -42,19 +42,23 @@ describe 'TokenTree', ->
 	simple_tree = null
 
 	beforeEach ->
-		tree = new TokenTree grammar, '@element'
-		simple_tree = new TokenTree simple_grammar, '@root'
+		tree = new TokenTree grammar, element_string, '@element'
+		simple_tree = new TokenTree simple_grammar, abc_string, '@root'
 
 	describe 'constructor', ->
-
-		it 'creates a tree based on a grammar instance and a root token', ->
+		it 'creates a tree based on a grammar instance, a string and a root token', ->
 			tree.grammar.should.deep.equal grammar
+
+		it 'sets current_token to the root_token', ->
 			tree.current_token.should.deep.equal
 				name: '@element'
 				children: []
 				next: null
 				match: null
 			tree.current_token.should.deep.equal tree.root_token
+
+		it 'sets position to zero', ->
+			tree.position.should.equal 0
 
 	describe 'create_node', ->
 		it 'creates an empty tree node based on a token name', ->
@@ -99,16 +103,16 @@ describe 'TokenTree', ->
 				'@child' : ['@abc']
 				'@parent': ['@child', '@next']
 
-			lonely_child_tree = new TokenTree lonely_child_grammar, '@parent'
+			lonely_child_tree = new TokenTree lonely_child_grammar, abc_string, '@parent'
 			do lonely_child_tree.expand
 			child_token = lonely_child_tree.root_token.children[0].children[0];
 			child_token.next.name.should.equal '@next'
 
 
 	describe 'match', ->
-		it 'matches contiguous terminal tokens starting from current_token in a string starting from specified position', ->
+		it 'matches contiguous terminal tokens starting from current_token', ->
 			do tree.expand
-			tree.match element_string, 0
+			do tree.match
 			#TREE
 			# @element 0 1
 			#   @tag_open 0 1
@@ -127,16 +131,38 @@ describe 'TokenTree', ->
 			ang_start_token.match.should.deep.equal { position: 0, length: 1 }
 
 			do simple_tree.expand
-			simple_tree.match abc_string, 0
+			do simple_tree.match
 			abc_token = simple_tree.root_token.children[0]
 			abc_token.children.should.have.property 'length', 3
 			abc_token.children[0].match.should.deep.equal { position: 0, length: 1 }
 			abc_token.children[1].match.should.deep.equal { position: 1, length: 1 }
 			abc_token.children[2].match.should.deep.equal { position: 2, length: 1 }
 
+		it 'updates lookup position', ->
+			do tree.expand
+			do tree.match
+			tree.position.should.equal 1
+			do tree.expand
+			#TREE
+			# @element 0 6
+			#   @tag_open 0 6
+			#     @ang_start 0 1
+			#     @tagname 1 4
+			#       @text 1 4
+			#     @space 5 1
+			#     @attribute <--
+			#     @ang_end
+			#   @text
+			#   @tag_close
+			#
+			# <span class="item">text</span>
+			#       ^
+			do tree.match
+			tree.position.should.equal 6
+
 		it 'uses terminal matches to calculate match properties for all non-terminals', ->
 			do simple_tree.expand
-			simple_tree.match abc_string, 0
+			do simple_tree.match
 			abc_token = simple_tree.root_token.children[0]
 			abc_token.match.should.deep.equal { position: 0, length: 3 }
 			simple_tree.root_token.match.should.deep.equal { position: 0, length: 3 }
