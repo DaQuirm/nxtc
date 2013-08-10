@@ -17,7 +17,9 @@ class TokenTree
 				@current_token.children[index-1].next = node unless index is 0
 
 			[first_child, _..., last_child] = @current_token.children
-			last_child.next = @current_token.next if last_child?
+			last_child ?= first_child
+			last_child.next = @current_token.next
+			last_child.parent = @current_token
 			@current_token = @current_token.next = first_child
 
 	match: (string, start) ->
@@ -26,6 +28,12 @@ class TokenTree
 			@current_token.match =
 				position: match.index + start
 				length: match[0].length
+			parent = @current_token.parent
+			while parent
+				parent.match =
+					position: parent.children[0].match.position
+					length: parent.children.reduce ((sum, item) -> sum + item.match.length), 0
+				parent = parent.parent
 			@current_token = @current_token.next
 
 module.exports = TokenTree

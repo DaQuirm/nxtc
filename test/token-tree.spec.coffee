@@ -93,6 +93,18 @@ describe 'TokenTree', ->
 			tag_close_token = ang_end_token.next.next
 			should.not.exist tag_close_token.next
 
+			lonely_child_grammar = new Grammar
+				'@abc'   : regex: 'ab'
+				'@next'  : regex: 'c'
+				'@child' : ['@abc']
+				'@parent': ['@child', '@next']
+
+			lonely_child_tree = new TokenTree lonely_child_grammar, '@parent'
+			do lonely_child_tree.expand
+			child_token = lonely_child_tree.root_token.children[0].children[0];
+			child_token.next.name.should.equal '@next'
+
+
 	describe 'match', ->
 		it 'matches contiguous terminal tokens starting from current_token in a string starting from specified position', ->
 			do tree.expand
@@ -122,14 +134,9 @@ describe 'TokenTree', ->
 			abc_token.children[1].match.should.deep.equal { position: 1, length: 1 }
 			abc_token.children[2].match.should.deep.equal { position: 2, length: 1 }
 
-	describe 'bloom', ->
-		it 'uses terminal matches to calculate match proeprties for all non-terminals', ->
+		it 'uses terminal matches to calculate match properties for all non-terminals', ->
 			do simple_tree.expand
 			simple_tree.match abc_string, 0
-			do simple_tree.bloom
 			abc_token = simple_tree.root_token.children[0]
 			abc_token.match.should.deep.equal { position: 0, length: 3 }
 			simple_tree.root_token.match.should.deep.equal { position: 0, length: 3 }
-
-
-
