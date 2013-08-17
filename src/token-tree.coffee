@@ -12,10 +12,17 @@ class TokenTree
 
 	expand: ->
 		while not @grammar.is_terminal @current_token.name
+
 			@grammar.tokens[@current_token.name].forEach (token, index) =>
+				{token, quantifier} = token if typeof token is 'object'
 				node = TokenTree.create_node token
-				@current_token.children.push node
-				@current_token.children[index-1].next = node unless index is 0
+				quantifier ?= 1
+				nodes = Array::map.call (Array ++quantifier).join('|'), -> TokenTree.create_node token
+				@current_token.children = @current_token.children.concat nodes
+
+			@current_token.children.reduce (previous, current) ->
+				previous.next = current
+				current
 
 			[first_child, _..., last_child] = @current_token.children
 			last_child ?= first_child

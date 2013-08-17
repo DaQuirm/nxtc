@@ -108,6 +108,34 @@ describe 'TokenTree', ->
 			child_token = lonely_child_tree.root_token.children[0].children[0];
 			child_token.next.name.should.equal '@next'
 
+		it 'supports extended token notation with a literal instead of name', ->
+			abbr_grammar = new Grammar
+				'@state_abbr': [
+					{ token: '@letter' }
+					{ token: '@letter' }
+				]
+				'@letter': regex:'[A-Z]'
+			tree = new TokenTree abbr_grammar, 'CA', '@state_abbr'
+			do tree.expand
+			#TREE
+			# @state_abbr
+			#   @letter <--
+			#   @letter
+			tree.current_token.name.should.equal '@letter'
+			tree.root_token.children.should.have.property 'length', 2
+			tree.root_token.children[1].name.should.equal '@letter'
+
+		it 'expands tokens with integer quantifiers as multiple nodes', ->
+			abbr_grammar = new Grammar
+				'@state_abbr': [
+					{ token: '@letter', quantifier: 2 }
+				]
+				'@letter': regex:'[A-Z]'
+			tree = new TokenTree abbr_grammar, 'CA', '@state_abbr'
+			do tree.expand
+			tree.current_token.name.should.equal '@letter'
+			tree.root_token.children.should.have.property 'length', 2
+			tree.root_token.children[1].name.should.equal '@letter'
 
 	describe 'match', ->
 		it 'matches contiguous terminal tokens starting from current_token', ->
